@@ -1,0 +1,44 @@
+﻿{
+    "schemaVersion":  1,
+    "id":  "pwrideperspective",
+    "version":  "${version}",
+    "name":  "PWrideperspective",
+    "description":  "Кинематографическая камера при езде на мобах с независимым управлением.",
+    "authors":  [
+                    "PWteam"
+                ],
+    "contact":  {
+                    "homepage":  "https://fabricmc.net/"
+                },
+    "license":  "All Rights Reserved",
+    "icon":  "assets/modid/icon.png",
+    "environment":  "*",
+    "entrypoints":  {
+                        "main":  [
+                                     "ru.pwteam.pwrideperspective.ExampleMod"
+                                 ],
+                        "client":  [
+                                       "ru.pwteam.pwrideperspective.ExampleModClient"
+                                   ],
+                        "modmenu":  [
+                                        "ru.pwteam.pwrideperspective.client.PWridePerspectiveModMenu"
+                                   ]
+                    },
+    "mixins":  [
+                   "pwrideperspective.mixins.json",
+                   {
+                       "config":  "pwrideperspective.client.mixins.json",
+                       "environment":  "client"
+                   }
+               ],
+    "depends":  {
+                    "fabricloader":  "\u003e=0.18.4",
+                    "minecraft":  "~1.21.4",
+                    "java":  "\u003e=21",
+                    "fabric-api":  "*",
+                    "cloth-config2": ">=17.0.144"
+                },
+    "suggests":  {
+                     "modmenu":  "*"
+                }
+}
