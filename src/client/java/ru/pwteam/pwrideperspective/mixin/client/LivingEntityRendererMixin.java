@@ -4,7 +4,7 @@ import ru.pwteam.pwrideperspective.client.CameraTransitionController;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
-import net.minecraft.client.renderer.entity.state.PlayerRenderState;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -17,7 +17,7 @@ public abstract class LivingEntityRendererMixin {
 		LivingEntityRenderState state,
 		CallbackInfoReturnable<Integer> cir
 	) {
-		if (!(state instanceof PlayerRenderState playerState)) {
+		if (!(state instanceof AvatarRenderState playerState)) {
 			return;
 		}
 
