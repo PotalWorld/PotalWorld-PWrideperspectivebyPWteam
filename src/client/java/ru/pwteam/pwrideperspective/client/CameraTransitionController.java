@@ -3,17 +3,19 @@ package ru.pwteam.pwrideperspective.client;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Input;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.EggItem;
 import net.minecraft.world.item.MaceItem;
 import net.minecraft.world.item.SnowballItem;
-import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.TridentItem;
 import net.minecraft.world.item.WindChargeItem;
@@ -485,7 +487,7 @@ public final class CameraTransitionController {
 				|| this.maceHoldTicks > 0
 				|| this.axeHoldTicks > 0;
 		if (shouldSlideToGroundFirstPerson) {
-			Vec3 currentCam = client.gameRenderer.getMainCamera().getPosition();
+			Vec3 currentCam = client.gameRenderer.getMainCamera().position();
 			this.dismountSlideStartPos = this.lastRidingEyePos.lengthSqr() > 0.0001D ? this.lastRidingEyePos : currentCam;
 			this.dismountSlideTargetPos = player.getEyePosition(1.0F);
 			if (client.options.getCameraType() == CameraType.FIRST_PERSON) {
@@ -606,8 +608,6 @@ public final class CameraTransitionController {
 	}
 
 	private void lockPlayerMovement(LocalPlayer player) {
-		player.input.forwardImpulse = 0.0F;
-		player.input.leftImpulse = 0.0F;
 		player.xxa = 0.0F;
 		player.zza = 0.0F;
 		player.input.keyPresses = new Input(false, false, false, false, false, false, false);
@@ -699,8 +699,6 @@ public final class CameraTransitionController {
 				}
 			}
 
-			player.input.forwardImpulse = forwardImpulse;
-			player.input.leftImpulse = leftImpulse;
 			player.xxa = leftImpulse;
 			player.zza = forwardImpulse;
 			player.input.keyPresses = new Input(
@@ -713,8 +711,6 @@ public final class CameraTransitionController {
 				client.options.keySprint.isDown()
 			);
 		} else {
-			player.input.forwardImpulse = 0.0F;
-			player.input.leftImpulse = 0.0F;
 			player.xxa = 0.0F;
 			player.zza = 0.0F;
 			player.input.keyPresses = new Input(
@@ -797,7 +793,7 @@ public final class CameraTransitionController {
 				|| (this.hasItemInHands(player, TridentItem.class) && useDown));
 		boolean swordActive = cfg.swordEnabled
 			&& client.options.keyAttack.isDown()
-			&& this.hasItemInHands(player, SwordItem.class);
+			&& this.hasItemInHandsTag(player, ItemTags.SWORDS);
 		boolean maceActive = cfg.maceEnabled
 			&& client.options.keyAttack.isDown()
 			&& this.hasItemInHands(player, MaceItem.class);
@@ -866,6 +862,11 @@ public final class CameraTransitionController {
 			|| itemClass.isInstance(player.getOffhandItem().getItem());
 	}
 
+	private boolean hasItemInHandsTag(LocalPlayer player, TagKey<Item> tag) {
+		return player.getMainHandItem().is(tag)
+			|| player.getOffhandItem().is(tag);
+	}
+
 	private boolean hasDirectionalInput(Minecraft client) {
 		return client.options.keyUp.isDown()
 			|| client.options.keyDown.isDown()
@@ -882,7 +883,7 @@ public final class CameraTransitionController {
 			return;
 		}
 
-		long window = client.getWindow().getWindow();
+		long window = client.getWindow().handle();
 		PWridePerspectiveConfig cfg = PWridePerspectiveConfigManager.get();
 		boolean modifierDown = this.isKeyDown(window, cfg.cameraAdjustModifierKey);
 		boolean zoomInDown = this.isKeyDown(window, cfg.cameraZoomInKey);

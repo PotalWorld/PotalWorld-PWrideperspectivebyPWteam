@@ -5,7 +5,7 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -24,7 +24,7 @@ public abstract class CameraMixin {
 
 	@Inject(method = "setup", at = @At("TAIL"))
 	private void mountCinematicCamera$applyOffset(
-		BlockGetter area,
+		Level area,
 		Entity focusedEntity,
 		boolean thirdPerson,
 		boolean inverseView,
