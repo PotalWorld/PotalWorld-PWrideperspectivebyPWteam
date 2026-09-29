@@ -2,10 +2,10 @@ package ru.pwteam.pwrideperspective.mixin.client;
 
 import ru.pwteam.pwrideperspective.client.CameraTransitionController;
 import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -22,15 +22,20 @@ public abstract class CameraMixin {
 	@Shadow
 	protected abstract void setRotation(float yRot, float xRot);
 
-	@Inject(method = "setup", at = @At("TAIL"))
+	@Inject(
+		method = "update",
+		at = @At(
+			value = "INVOKE",
+			target = "Lnet/minecraft/client/Camera;getViewRotationMatrix(Lorg/joml/Matrix4f;)Lorg/joml/Matrix4f;",
+			shift = At.Shift.BEFORE
+		)
+	)
 	private void mountCinematicCamera$applyOffset(
-		BlockGetter area,
-		Entity focusedEntity,
-		boolean thirdPerson,
-		boolean inverseView,
-		float tickDelta,
+		DeltaTracker deltaTracker,
 		CallbackInfo ci
 	) {
+		float tickDelta = deltaTracker.getGameTimeDeltaPartialTick(false);
+		Entity focusedEntity = ((Camera) (Object) this).entity();
 		if (!(focusedEntity instanceof LocalPlayer player)) {
 			return;
 		}

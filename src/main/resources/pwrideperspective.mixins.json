@@ -2,7 +2,9 @@
 	"required": false,
 	"package": "ru.pwteam.pwrideperspective.mixin",
 	"compatibilityLevel": "JAVA_21",
-	"mixins": [],
+	"mixins": [
+		"PlayerMixin"
+	],
 	"injectors": {
 		"defaultRequire": 1
 	},
