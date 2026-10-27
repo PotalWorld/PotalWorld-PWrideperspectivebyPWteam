@@ -6,8 +6,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.vehicle.AbstractBoat;
-import net.minecraft.world.entity.player.Input;
+import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.CrossbowItem;
@@ -612,9 +611,14 @@ public final class CameraTransitionController {
 	private void lockPlayerMovement(LocalPlayer player) {
 		player.input.forwardImpulse = 0.0F;
 		player.input.leftImpulse = 0.0F;
+		player.input.up = false;
+		player.input.down = false;
+		player.input.left = false;
+		player.input.right = false;
+		player.input.jumping = false;
+		player.input.shiftKeyDown = false;
 		player.xxa = 0.0F;
 		player.zza = 0.0F;
-		player.input.keyPresses = new Input(false, false, false, false, false, false, false);
 		player.setSprinting(false);
 	}
 
@@ -704,38 +708,34 @@ public final class CameraTransitionController {
 			}
 
 			// Boats only gain forward speed from forward input; steering direction comes from the boat's yaw.
-			if (player.getVehicle() instanceof AbstractBoat) {
+			if (player.getVehicle() instanceof Boat) {
 				forwardImpulse = 1.0F;
 				leftImpulse = 0.0F;
 			}
 
 			player.input.forwardImpulse = forwardImpulse;
 			player.input.leftImpulse = leftImpulse;
+			player.input.up = forwardImpulse > 0.1F;
+			player.input.down = forwardImpulse < -0.1F;
+			player.input.left = leftImpulse > 0.1F;
+			player.input.right = leftImpulse < -0.1F;
+			player.input.jumping = client.options.keyJump.isDown();
+			player.input.shiftKeyDown = client.options.keyShift.isDown();
 			player.xxa = leftImpulse;
 			player.zza = forwardImpulse;
-			player.input.keyPresses = new Input(
-				forwardImpulse > 0.1F,
-				forwardImpulse < -0.1F,
-				leftImpulse > 0.1F,
-				leftImpulse < -0.1F,
-				client.options.keyJump.isDown(),
-				client.options.keyShift.isDown(),
-				client.options.keySprint.isDown()
-			);
+			player.setSprinting(client.options.keySprint.isDown() && forwardImpulse > 0.0F);
 		} else {
 			player.input.forwardImpulse = 0.0F;
 			player.input.leftImpulse = 0.0F;
+			player.input.up = false;
+			player.input.down = false;
+			player.input.left = false;
+			player.input.right = false;
+			player.input.jumping = client.options.keyJump.isDown();
+			player.input.shiftKeyDown = client.options.keyShift.isDown();
 			player.xxa = 0.0F;
 			player.zza = 0.0F;
-			player.input.keyPresses = new Input(
-				false,
-				false,
-				false,
-				false,
-				client.options.keyJump.isDown(),
-				client.options.keyShift.isDown(),
-				client.options.keySprint.isDown()
-			);
+			player.setSprinting(false);
 		}
 	}
 
