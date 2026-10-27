@@ -5,7 +5,6 @@
 	"client": [
 		"CameraMixin",
 		"EntityTurnMixin",
-		"LivingEntityRendererMixin",
 		"LocalPlayerMixin"
 	],
 	"injectors": {
