@@ -4,6 +4,7 @@ import net.minecraft.client.CameraType;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
@@ -18,12 +19,10 @@ import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.EggItem;
 import net.minecraft.world.item.MaceItem;
 import net.minecraft.world.item.SnowballItem;
-import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.TridentItem;
 import net.minecraft.world.item.WindChargeItem;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.phys.Vec3;
-import org.lwjgl.glfw.GLFW;
 import ru.pwteam.pwrideperspective.config.PWridePerspectiveConfig;
 import ru.pwteam.pwrideperspective.config.PWridePerspectiveConfigManager;
 
@@ -810,7 +809,7 @@ public final class CameraTransitionController {
 			&& this.hasItemInHands(player, MaceItem.class);
 		boolean axeActive = cfg.axeEnabled
 			&& client.options.keyAttack.isDown()
-			&& this.hasItemInHands(player, AxeItem.class);
+			&& this.hasItemInHandsTag(player, ItemTags.AXES);
 
 		this.crossbowHoldTicks = this.nextHoldTicks(this.crossbowHoldTicks, crossbowActive, cfg.crossbowSeconds);
 		this.snowballHoldTicks = this.nextHoldTicks(this.snowballHoldTicks, snowballActive, cfg.snowballSeconds);
@@ -973,7 +972,7 @@ public final class CameraTransitionController {
 	}
 
 	private boolean isKeyDown(long window, int keyCode) {
-		return keyCode != GLFW.GLFW_KEY_UNKNOWN && GLFW.glfwGetKey(window, keyCode) == GLFW.GLFW_PRESS;
+		return keyCode != -1 && InputConstants.isKeyDown(keyCode);
 	}
 
 	private void blockRiptideOnMount(LocalPlayer player, Minecraft client) {

@@ -40,13 +40,13 @@ public class PWridePerspectiveModMenu implements ModMenuApi {
 			addItemEntries(entries, items, "mace", () -> config.maceEnabled, v -> config.maceEnabled = v, () -> config.maceSeconds, v -> config.maceSeconds = v);
 			addItemEntries(entries, items, "axe", () -> config.axeEnabled, v -> config.axeEnabled = v, () -> config.axeSeconds, v -> config.axeSeconds = v);
 
-			addKeyEntry(entries, binds, "modifier", config.cameraAdjustModifierKey, org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_ALT, v -> config.cameraAdjustModifierKey = v);
-			addKeyEntry(entries, binds, "left", config.cameraAdjustLeftKey, org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT, v -> config.cameraAdjustLeftKey = v);
-			addKeyEntry(entries, binds, "right", config.cameraAdjustRightKey, org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT, v -> config.cameraAdjustRightKey = v);
-			addKeyEntry(entries, binds, "up", config.cameraAdjustUpKey, org.lwjgl.glfw.GLFW.GLFW_KEY_UP, v -> config.cameraAdjustUpKey = v);
-			addKeyEntry(entries, binds, "down", config.cameraAdjustDownKey, org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN, v -> config.cameraAdjustDownKey = v);
-			addKeyEntry(entries, binds, "zoom_in", config.cameraZoomInKey, org.lwjgl.glfw.GLFW.GLFW_KEY_UNKNOWN, v -> config.cameraZoomInKey = v);
-			addKeyEntry(entries, binds, "zoom_out", config.cameraZoomOutKey, org.lwjgl.glfw.GLFW.GLFW_KEY_UNKNOWN, v -> config.cameraZoomOutKey = v);
+			addKeyEntry(entries, binds, "modifier", config.cameraAdjustModifierKey, InputConstants.KEY_LALT, v -> config.cameraAdjustModifierKey = v);
+			addKeyEntry(entries, binds, "left", config.cameraAdjustLeftKey, InputConstants.KEY_LEFT, v -> config.cameraAdjustLeftKey = v);
+			addKeyEntry(entries, binds, "right", config.cameraAdjustRightKey, InputConstants.KEY_RIGHT, v -> config.cameraAdjustRightKey = v);
+			addKeyEntry(entries, binds, "up", config.cameraAdjustUpKey, InputConstants.KEY_UP, v -> config.cameraAdjustUpKey = v);
+			addKeyEntry(entries, binds, "down", config.cameraAdjustDownKey, InputConstants.KEY_DOWN, v -> config.cameraAdjustDownKey = v);
+			addKeyEntry(entries, binds, "zoom_in", config.cameraZoomInKey, -1, v -> config.cameraZoomInKey = v);
+			addKeyEntry(entries, binds, "zoom_out", config.cameraZoomOutKey, -1, v -> config.cameraZoomOutKey = v);
 
 			return builder.build();
 		};
@@ -60,8 +60,8 @@ public class PWridePerspectiveModMenu implements ModMenuApi {
 	}
 
 	private static InputConstants.Key keyFromCode(int keyCode) {
-		if (keyCode == org.lwjgl.glfw.GLFW.GLFW_KEY_UNKNOWN) return InputConstants.UNKNOWN;
-		return InputConstants.Type.KEYSYM.getOrCreate(keyCode);
+		if (keyCode == -1) return InputConstants.UNKNOWN;
+		return InputConstants.Type.KEYBOARD.getOrCreate(keyCode);
 	}
 
 	private static void addItemEntries(ConfigEntryBuilder entries, ConfigCategory category, String itemKey,

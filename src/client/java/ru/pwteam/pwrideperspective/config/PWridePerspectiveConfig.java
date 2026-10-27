@@ -1,6 +1,6 @@
 package ru.pwteam.pwrideperspective.config;
 
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 public class PWridePerspectiveConfig {
 	public boolean modEnabled = true;
@@ -36,11 +36,11 @@ public class PWridePerspectiveConfig {
 	public double rideCameraUpOffset = 0.0D;
 	public double rideCameraDistanceOffset = 0.0D;
 
-	public int cameraAdjustModifierKey = GLFW.GLFW_KEY_LEFT_ALT;
-	public int cameraAdjustLeftKey = GLFW.GLFW_KEY_LEFT;
-	public int cameraAdjustRightKey = GLFW.GLFW_KEY_RIGHT;
-	public int cameraAdjustUpKey = GLFW.GLFW_KEY_UP;
-	public int cameraAdjustDownKey = GLFW.GLFW_KEY_DOWN;
-	public int cameraZoomInKey = GLFW.GLFW_KEY_UNKNOWN;
-	public int cameraZoomOutKey = GLFW.GLFW_KEY_UNKNOWN;
+	public int cameraAdjustModifierKey = InputConstants.KEY_LALT;
+	public int cameraAdjustLeftKey = InputConstants.KEY_LEFT;
+	public int cameraAdjustRightKey = InputConstants.KEY_RIGHT;
+	public int cameraAdjustUpKey = InputConstants.KEY_UP;
+	public int cameraAdjustDownKey = InputConstants.KEY_DOWN;
+	public int cameraZoomInKey = -1;
+	public int cameraZoomOutKey = -1;
 }

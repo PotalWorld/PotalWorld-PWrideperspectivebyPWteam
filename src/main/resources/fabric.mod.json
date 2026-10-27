@@ -1,9 +1,9 @@
-﻿{
+{
     "schemaVersion":  1,
     "id":  "pwrideperspective",
     "version":  "${version}",
     "name":  "PWrideperspective",
-    "description":  "Кинематографическая камера при езде на мобах с независимым управлением.",
+    "description":  "A cinematic riding camera with independent movement controls.",
     "authors":  [
                     "PWteam"
                 ],
@@ -32,13 +32,14 @@
                    }
                ],
     "depends":  {
-                    "fabricloader":  "\u003e=0.18.4",
-                    "minecraft":  ">=26.1 <26.3",
+                    "fabricloader":  "\u003e=0.19.5",
+                    "minecraft":  ">=26.3 <26.4",
                     "java":  "\u003e=25",
                     "fabric-api":  "*",
-                    "cloth-config2": ">=26.1.154"
+                    "cloth-config2": ">=26.3.159"
                 },
     "suggests":  {
                      "modmenu":  "*"
                 }
 }
+
