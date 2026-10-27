@@ -67,10 +67,10 @@ public class PWridePerspectiveModMenu implements ModMenuApi {
 	private static void addItemEntries(ConfigEntryBuilder entries, ConfigCategory category, String itemKey,
 		java.util.function.Supplier<Boolean> enabledSupplier, java.util.function.Consumer<Boolean> enabledSaver,
 		java.util.function.Supplier<Double> secondsSupplier, java.util.function.Consumer<Double> secondsSaver) {
-		Component itemName = Component.translatable(KEY + "item." + itemKey);
-		category.addEntry(entries.startBooleanToggle(Component.translatable(KEY + "combat", itemName), enabledSupplier.get())
+		String itemLabelKey = KEY + "item." + itemKey;
+		category.addEntry(entries.startBooleanToggle(Component.translatable(itemLabelKey + ".combat"), enabledSupplier.get())
 			.setDefaultValue(true).setSaveConsumer(enabledSaver).build());
-		category.addEntry(entries.startDoubleField(Component.translatable(KEY + "duration", itemName), secondsSupplier.get())
+		category.addEntry(entries.startDoubleField(Component.translatable(itemLabelKey + ".duration"), secondsSupplier.get())
 			.setDefaultValue(0.0D).setMin(0.0D).setMax(60.0D).setSaveConsumer(secondsSaver).build());
 	}
 }
