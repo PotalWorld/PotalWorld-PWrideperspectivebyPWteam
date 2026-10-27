@@ -1,9 +1,9 @@
-﻿{
+{
     "schemaVersion":  1,
     "id":  "pwrideperspective",
     "version":  "${version}",
     "name":  "PWrideperspective",
-    "description":  "Кинематографическая камера при езде на мобах с независимым управлением.",
+    "description":  "A cinematic riding camera with independent movement controls.",
     "authors":  [
                     "PWteam"
                 ],
