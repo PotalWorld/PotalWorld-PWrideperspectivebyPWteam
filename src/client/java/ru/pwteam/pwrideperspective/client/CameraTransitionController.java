@@ -9,6 +9,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
 import net.minecraft.world.entity.player.Input;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -327,6 +328,9 @@ public final class CameraTransitionController {
 			this.progress = 0.0F;
 			this.lastProgress = 0.0F;
 			this.inAimFirstPerson = false;
+			// The detached combat view may be looking down; restore the rider's head to level when returning to third person.
+			this.controlYaw = observedYaw;
+			this.applyPlayerLook(player, observedYaw, 0.0F);
 		} else if (this.mode == MODE_AIM_IN) {
 			this.mode = MODE_AIM_OUT;
 		}
@@ -698,6 +702,12 @@ public final class CameraTransitionController {
 					forwardImpulse *= scale;
 					leftImpulse *= scale;
 				}
+			}
+
+			// Boats only gain forward speed from forward input. Steering direction is already represented by controlYaw.
+			if (player.getVehicle() instanceof AbstractBoat) {
+				forwardImpulse = 1.0F;
+				leftImpulse = 0.0F;
 			}
 
 			player.xxa = leftImpulse;
