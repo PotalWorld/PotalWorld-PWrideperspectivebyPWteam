@@ -35,11 +35,9 @@ public class PWridePerspectiveModMenu implements ModMenuApi {
 			addItemEntries(entries, items, "crossbow", () -> config.crossbowEnabled, v -> config.crossbowEnabled = v, () -> config.crossbowSeconds, v -> config.crossbowSeconds = v);
 			addItemEntries(entries, items, "snowball", () -> config.snowballEnabled, v -> config.snowballEnabled = v, () -> config.snowballSeconds, v -> config.snowballSeconds = v);
 			addItemEntries(entries, items, "egg", () -> config.eggEnabled, v -> config.eggEnabled = v, () -> config.eggSeconds, v -> config.eggSeconds = v);
-			addItemEntries(entries, items, "wind_charge", () -> config.windChargeEnabled, v -> config.windChargeEnabled = v, () -> config.windChargeSeconds, v -> config.windChargeSeconds = v);
 			addItemEntries(entries, items, "bow", () -> config.bowEnabled, v -> config.bowEnabled = v, () -> config.bowSeconds, v -> config.bowSeconds = v);
 			addItemEntries(entries, items, "trident", () -> config.tridentEnabled, v -> config.tridentEnabled = v, () -> config.tridentSeconds, v -> config.tridentSeconds = v);
 			addItemEntries(entries, items, "sword", () -> config.swordEnabled, v -> config.swordEnabled = v, () -> config.swordSeconds, v -> config.swordSeconds = v);
-			addItemEntries(entries, items, "mace", () -> config.maceEnabled, v -> config.maceEnabled = v, () -> config.maceSeconds, v -> config.maceSeconds = v);
 			addItemEntries(entries, items, "axe", () -> config.axeEnabled, v -> config.axeEnabled = v, () -> config.axeSeconds, v -> config.axeSeconds = v);
 
 			addKeyEntry(entries, binds, "modifier", config.cameraAdjustModifierKey, org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_ALT, v -> config.cameraAdjustModifierKey = v);
