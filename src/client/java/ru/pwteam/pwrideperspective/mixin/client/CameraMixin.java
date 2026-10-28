@@ -31,9 +31,10 @@ public abstract class CameraMixin {
 		float tickDelta,
 		CallbackInfo ci
 	) {
-		if (!(focusedEntity instanceof LocalPlayer player)) {
+		if (!(focusedEntity instanceof LocalPlayer)) {
 			return;
 		}
+		LocalPlayer player = (LocalPlayer) focusedEntity;
 
 		Minecraft client = Minecraft.getInstance();
 		boolean moveCamera = CameraTransitionController.INSTANCE.shouldMoveCamera(client, player);
@@ -69,7 +70,7 @@ public abstract class CameraMixin {
 		Vec3 targetPos = eyePos.add(offset);
 		Vec3 direction = targetPos.subtract(eyePos).normalize();
 
-		HitResult hit = player.level().clip(
+		HitResult hit = player.level.clip(
 			new ClipContext(
 				eyePos,
 				targetPos,

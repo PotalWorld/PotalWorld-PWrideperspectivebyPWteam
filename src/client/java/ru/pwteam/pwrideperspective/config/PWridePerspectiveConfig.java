@@ -14,8 +14,6 @@ public class PWridePerspectiveConfig {
 	public boolean eggEnabled = true;
 	public double eggSeconds = 0.0D;
 
-	public boolean windChargeEnabled = true;
-	public double windChargeSeconds = 0.0D;
 
 	public boolean bowEnabled = true;
 	public double bowSeconds = 3.0D;
@@ -26,8 +24,6 @@ public class PWridePerspectiveConfig {
 	public boolean swordEnabled = true;
 	public double swordSeconds = 4.0D;
 
-	public boolean maceEnabled = true;
-	public double maceSeconds = 4.0D;
 
 	public boolean axeEnabled = true;
 	public double axeSeconds = 4.0D;

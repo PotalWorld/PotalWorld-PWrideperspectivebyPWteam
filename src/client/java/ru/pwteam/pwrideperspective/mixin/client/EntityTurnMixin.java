@@ -13,9 +13,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class EntityTurnMixin {
 	@Inject(method = "turn", at = @At("HEAD"), cancellable = true)
 	private void mountCinematicCamera$detachRideCamera(double yawChange, double pitchChange, CallbackInfo ci) {
-		if (!((Object)this instanceof LocalPlayer player)) {
+		if (!((Object)this instanceof LocalPlayer)) {
 			return;
 		}
+		LocalPlayer player = (LocalPlayer) (Object) this;
 
 		Minecraft client = Minecraft.getInstance();
 		if (CameraTransitionController.INSTANCE.onDetachedMouseTurn(player, client, yawChange, pitchChange)) {

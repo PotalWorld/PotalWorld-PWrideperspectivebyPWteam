@@ -6,18 +6,15 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.vehicle.AbstractBoat;
-import net.minecraft.world.entity.player.Input;
+import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.EggItem;
-import net.minecraft.world.item.MaceItem;
 import net.minecraft.world.item.SnowballItem;
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.TridentItem;
-import net.minecraft.world.item.WindChargeItem;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.phys.Vec3;
 import org.lwjgl.glfw.GLFW;
@@ -88,11 +85,9 @@ public final class CameraTransitionController {
 	private int crossbowHoldTicks;
 	private int snowballHoldTicks;
 	private int eggHoldTicks;
-	private int windChargeHoldTicks;
 	private int bowHoldTicks;
 	private int tridentHoldTicks;
 	private int swordHoldTicks;
-	private int maceHoldTicks;
 	private int axeHoldTicks;
 	private boolean suppressBowTridentUntilUseRelease;
 	private int cameraOffsetAdjustCooldownTicks;
@@ -127,7 +122,7 @@ public final class CameraTransitionController {
 		if (riding) {
 			this.lastRidingEyePos = player.getEyePosition(1.0F);
 			if (!this.wasRiding) {
-				this.onMount(client, player, observedYaw, observedPitch, player.getYRot());
+				this.onMount(client, player, observedYaw, observedPitch, player.yRot);
 			}
 			this.tickRide(client, player, observedYaw, observedPitch);
 		} else {
@@ -444,11 +439,9 @@ public final class CameraTransitionController {
 		this.crossbowHoldTicks = 0;
 		this.snowballHoldTicks = 0;
 		this.eggHoldTicks = 0;
-		this.windChargeHoldTicks = 0;
 		this.bowHoldTicks = 0;
 		this.tridentHoldTicks = 0;
 		this.swordHoldTicks = 0;
-		this.maceHoldTicks = 0;
 		this.axeHoldTicks = 0;
 		this.suppressBowTridentUntilUseRelease = this.isBowOrTridentInHands(player) && client.options.keyUse.isDown();
 		boolean forceInstantGroupOnMount = this.hasInstantFirstPersonGroupInHands(player);
@@ -486,7 +479,6 @@ public final class CameraTransitionController {
 				|| this.bowHoldTicks > 0
 				|| this.tridentHoldTicks > 0
 				|| this.swordHoldTicks > 0
-				|| this.maceHoldTicks > 0
 				|| this.axeHoldTicks > 0;
 		if (shouldSlideToGroundFirstPerson) {
 			Vec3 currentCam = client.gameRenderer.getMainCamera().getPosition();
@@ -524,7 +516,7 @@ public final class CameraTransitionController {
 
 	private void beginRideRecenter(LocalPlayer player) {
 		float targetYaw = this.controlYaw;
-		float targetPitch = player.getXRot();
+		float targetPitch = player.xRot;
 		float delta = Math.abs(Mth.wrapDegrees(targetYaw - this.cameraYaw));
 		if (delta < 1.0F) {
 			return;
@@ -579,7 +571,7 @@ public final class CameraTransitionController {
 	}
 
 	public void onRideTickTail(LocalPlayer player) {
-		// Intentionally empty.
+		this.restoreDetachedAim(player, Minecraft.getInstance());
 	}
 
 	public void onAiStepInput(LocalPlayer player, Minecraft client) {
@@ -603,18 +595,35 @@ public final class CameraTransitionController {
 		if (!PWridePerspectiveConfigManager.get().modEnabled) {
 			return;
 		}
-		if (this.mode != MODE_DISMOUNT_FIRST_PERSON_SLIDE) {
+		if (this.mode == MODE_DISMOUNT_FIRST_PERSON_SLIDE) {
+			this.lockPlayerMovement(player);
 			return;
 		}
-		this.lockPlayerMovement(player);
+		this.restoreDetachedAim(player, client);
+	}
+
+	private void restoreDetachedAim(LocalPlayer player, Minecraft client) {
+		if (this.inAimFirstPerson
+			&& client.options.getCameraType() == CameraType.FIRST_PERSON
+			&& player.getVehicle() instanceof Boat) {
+			// Boat passenger positioning clamps the player's rotation to the boat's yaw.
+			// Restore the independent aim after vanilla updates the passenger so both
+			// local use-item logic and outgoing player rotation retain the camera direction.
+			this.applyPlayerLook(player, this.aimYaw, this.aimPitch);
+		}
 	}
 
 	private void lockPlayerMovement(LocalPlayer player) {
 		player.input.forwardImpulse = 0.0F;
 		player.input.leftImpulse = 0.0F;
+		player.input.up = false;
+		player.input.down = false;
+		player.input.left = false;
+		player.input.right = false;
+		player.input.jumping = false;
+		player.input.shiftKeyDown = false;
 		player.xxa = 0.0F;
 		player.zza = 0.0F;
-		player.input.keyPresses = new Input(false, false, false, false, false, false, false);
 		player.setSprinting(false);
 	}
 
@@ -650,10 +659,11 @@ public final class CameraTransitionController {
 	}
 
 	private void applyPlayerLook(LocalPlayer player, float yaw, float pitch) {
-		player.setYRot(yaw);
+		player.yRot = yaw;
 		player.setYHeadRot(yaw);
 		player.setYBodyRot(yaw);
-		player.setXRot(pitch);
+		player.yRot = yaw;
+		player.xRot = pitch;
 	}
 
 	private void applyControlYaw(LocalPlayer player, float yaw) {
@@ -662,8 +672,9 @@ public final class CameraTransitionController {
 			return;
 		}
 
-		vehicle.setYRot(yaw);
-		if (vehicle instanceof LivingEntity livingVehicle) {
+		vehicle.yRot = yaw;
+		if (vehicle instanceof LivingEntity) {
+			LivingEntity livingVehicle = (LivingEntity) vehicle;
 			livingVehicle.setYHeadRot(yaw);
 			livingVehicle.setYBodyRot(yaw);
 		}
@@ -678,7 +689,7 @@ public final class CameraTransitionController {
 			// Visual/player aim follows detached first-person camera, movement yaw stays independent on vehicle.
 			this.applyPlayerLook(player, this.aimYaw, this.aimPitch);
 		} else {
-			this.applyPlayerLook(player, this.controlYaw, player.getXRot());
+			this.applyPlayerLook(player, this.controlYaw, player.xRot);
 		}
 		this.applyControlYaw(player, this.controlYaw);
 
@@ -704,38 +715,34 @@ public final class CameraTransitionController {
 			}
 
 			// Boats only gain forward speed from forward input; steering direction comes from the boat's yaw.
-			if (player.getVehicle() instanceof AbstractBoat) {
+			if (player.getVehicle() instanceof Boat) {
 				forwardImpulse = 1.0F;
 				leftImpulse = 0.0F;
 			}
 
 			player.input.forwardImpulse = forwardImpulse;
 			player.input.leftImpulse = leftImpulse;
+			player.input.up = forwardImpulse > 0.1F;
+			player.input.down = forwardImpulse < -0.1F;
+			player.input.left = leftImpulse > 0.1F;
+			player.input.right = leftImpulse < -0.1F;
+			player.input.jumping = client.options.keyJump.isDown();
+			player.input.shiftKeyDown = client.options.keyShift.isDown();
 			player.xxa = leftImpulse;
 			player.zza = forwardImpulse;
-			player.input.keyPresses = new Input(
-				forwardImpulse > 0.1F,
-				forwardImpulse < -0.1F,
-				leftImpulse > 0.1F,
-				leftImpulse < -0.1F,
-				client.options.keyJump.isDown(),
-				client.options.keyShift.isDown(),
-				client.options.keySprint.isDown()
-			);
+			player.setSprinting(client.options.keySprint.isDown() && forwardImpulse > 0.0F);
 		} else {
 			player.input.forwardImpulse = 0.0F;
 			player.input.leftImpulse = 0.0F;
+			player.input.up = false;
+			player.input.down = false;
+			player.input.left = false;
+			player.input.right = false;
+			player.input.jumping = client.options.keyJump.isDown();
+			player.input.shiftKeyDown = client.options.keyShift.isDown();
 			player.xxa = 0.0F;
 			player.zza = 0.0F;
-			player.input.keyPresses = new Input(
-				false,
-				false,
-				false,
-				false,
-				client.options.keyJump.isDown(),
-				client.options.keyShift.isDown(),
-				client.options.keySprint.isDown()
-			);
+			player.setSprinting(false);
 		}
 	}
 
@@ -796,7 +803,6 @@ public final class CameraTransitionController {
 		boolean crossbowActive = cfg.crossbowEnabled && this.hasItemInHands(player, CrossbowItem.class);
 		boolean snowballActive = cfg.snowballEnabled && this.hasItemInHands(player, SnowballItem.class);
 		boolean eggActive = cfg.eggEnabled && this.hasItemInHands(player, EggItem.class);
-		boolean windChargeActive = cfg.windChargeEnabled && this.hasItemInHands(player, WindChargeItem.class);
 		boolean bowActive = cfg.bowEnabled
 			&& !this.suppressBowTridentUntilUseRelease
 			&& (this.isUsingItemType(player, BowItem.class)
@@ -808,9 +814,6 @@ public final class CameraTransitionController {
 		boolean swordActive = cfg.swordEnabled
 			&& client.options.keyAttack.isDown()
 			&& this.hasItemInHands(player, SwordItem.class);
-		boolean maceActive = cfg.maceEnabled
-			&& client.options.keyAttack.isDown()
-			&& this.hasItemInHands(player, MaceItem.class);
 		boolean axeActive = cfg.axeEnabled
 			&& client.options.keyAttack.isDown()
 			&& this.hasItemInHands(player, AxeItem.class);
@@ -818,11 +821,9 @@ public final class CameraTransitionController {
 		this.crossbowHoldTicks = this.nextHoldTicks(this.crossbowHoldTicks, crossbowActive, cfg.crossbowSeconds);
 		this.snowballHoldTicks = this.nextHoldTicks(this.snowballHoldTicks, snowballActive, cfg.snowballSeconds);
 		this.eggHoldTicks = this.nextHoldTicks(this.eggHoldTicks, eggActive, cfg.eggSeconds);
-		this.windChargeHoldTicks = this.nextHoldTicks(this.windChargeHoldTicks, windChargeActive, cfg.windChargeSeconds);
 		this.bowHoldTicks = this.nextHoldTicks(this.bowHoldTicks, bowActive, cfg.bowSeconds);
 		this.tridentHoldTicks = this.nextHoldTicks(this.tridentHoldTicks, tridentActive, cfg.tridentSeconds);
 		this.swordHoldTicks = this.nextHoldTicks(this.swordHoldTicks, swordActive, cfg.swordSeconds);
-		this.maceHoldTicks = this.nextHoldTicks(this.maceHoldTicks, maceActive, cfg.maceSeconds);
 		this.axeHoldTicks = this.nextHoldTicks(this.axeHoldTicks, axeActive, cfg.axeSeconds);
 	}
 
@@ -830,11 +831,9 @@ public final class CameraTransitionController {
 		return this.crossbowHoldTicks > 0
 			|| this.snowballHoldTicks > 0
 			|| this.eggHoldTicks > 0
-			|| this.windChargeHoldTicks > 0
 			|| this.bowHoldTicks > 0
 			|| this.tridentHoldTicks > 0
 			|| this.swordHoldTicks > 0
-			|| this.maceHoldTicks > 0
 			|| this.axeHoldTicks > 0;
 	}
 
@@ -846,9 +845,7 @@ public final class CameraTransitionController {
 		boolean offSnowball = cfg.snowballEnabled && player.getOffhandItem().getItem() instanceof SnowballItem;
 		boolean mainEgg = cfg.eggEnabled && player.getMainHandItem().getItem() instanceof EggItem;
 		boolean offEgg = cfg.eggEnabled && player.getOffhandItem().getItem() instanceof EggItem;
-		boolean mainWind = cfg.windChargeEnabled && player.getMainHandItem().getItem() instanceof WindChargeItem;
-		boolean offWind = cfg.windChargeEnabled && player.getOffhandItem().getItem() instanceof WindChargeItem;
-		return mainCrossbow || offCrossbow || mainSnowball || offSnowball || mainEgg || offEgg || mainWind || offWind;
+		return mainCrossbow || offCrossbow || mainSnowball || offSnowball || mainEgg || offEgg;
 	}
 
 	private boolean isBowOrTridentInHands(LocalPlayer player) {
@@ -971,7 +968,7 @@ public final class CameraTransitionController {
 		if (!(stack.getItem() instanceof TridentItem)) {
 			return false;
 		}
-		return EnchantmentHelper.getTridentSpinAttackStrength(stack, player) > 0.0F;
+		return EnchantmentHelper.getItemEnchantmentLevel(net.minecraft.world.item.enchantment.Enchantments.RIPTIDE, stack) > 0;
 	}
 
 	private float smoothStep(float t) {
@@ -1012,11 +1009,9 @@ public final class CameraTransitionController {
 		this.crossbowHoldTicks = 0;
 		this.snowballHoldTicks = 0;
 		this.eggHoldTicks = 0;
-		this.windChargeHoldTicks = 0;
 		this.bowHoldTicks = 0;
 		this.tridentHoldTicks = 0;
 		this.swordHoldTicks = 0;
-		this.maceHoldTicks = 0;
 		this.axeHoldTicks = 0;
 		this.suppressBowTridentUntilUseRelease = false;
 		this.cameraOffsetAdjustCooldownTicks = 0;

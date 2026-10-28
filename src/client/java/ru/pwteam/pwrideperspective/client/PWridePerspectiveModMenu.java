@@ -7,6 +7,7 @@ import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import ru.pwteam.pwrideperspective.config.PWridePerspectiveConfig;
 import ru.pwteam.pwrideperspective.config.PWridePerspectiveConfigManager;
 
@@ -19,15 +20,15 @@ public class PWridePerspectiveModMenu implements ModMenuApi {
 			PWridePerspectiveConfig config = PWridePerspectiveConfigManager.get();
 			ConfigBuilder builder = ConfigBuilder.create()
 				.setParentScreen(parent)
-				.setTitle(Component.translatable(KEY + "title"));
+				.setTitle(new TranslatableComponent(KEY + "title"));
 			builder.setSavingRunnable(PWridePerspectiveConfigManager::save);
 
 			ConfigEntryBuilder entries = builder.entryBuilder();
-			ConfigCategory general = builder.getOrCreateCategory(Component.translatable(KEY + "general"));
-			ConfigCategory items = builder.getOrCreateCategory(Component.translatable(KEY + "items"));
-			ConfigCategory binds = builder.getOrCreateCategory(Component.translatable(KEY + "bindings"));
+			ConfigCategory general = builder.getOrCreateCategory(new TranslatableComponent(KEY + "general"));
+			ConfigCategory items = builder.getOrCreateCategory(new TranslatableComponent(KEY + "items"));
+			ConfigCategory binds = builder.getOrCreateCategory(new TranslatableComponent(KEY + "bindings"));
 
-			general.addEntry(entries.startBooleanToggle(Component.translatable(KEY + "enabled"), config.modEnabled)
+			general.addEntry(entries.startBooleanToggle(new TranslatableComponent(KEY + "enabled"), config.modEnabled)
 				.setDefaultValue(true)
 				.setSaveConsumer(value -> config.modEnabled = value)
 				.build());
@@ -35,11 +36,9 @@ public class PWridePerspectiveModMenu implements ModMenuApi {
 			addItemEntries(entries, items, "crossbow", () -> config.crossbowEnabled, v -> config.crossbowEnabled = v, () -> config.crossbowSeconds, v -> config.crossbowSeconds = v);
 			addItemEntries(entries, items, "snowball", () -> config.snowballEnabled, v -> config.snowballEnabled = v, () -> config.snowballSeconds, v -> config.snowballSeconds = v);
 			addItemEntries(entries, items, "egg", () -> config.eggEnabled, v -> config.eggEnabled = v, () -> config.eggSeconds, v -> config.eggSeconds = v);
-			addItemEntries(entries, items, "wind_charge", () -> config.windChargeEnabled, v -> config.windChargeEnabled = v, () -> config.windChargeSeconds, v -> config.windChargeSeconds = v);
 			addItemEntries(entries, items, "bow", () -> config.bowEnabled, v -> config.bowEnabled = v, () -> config.bowSeconds, v -> config.bowSeconds = v);
 			addItemEntries(entries, items, "trident", () -> config.tridentEnabled, v -> config.tridentEnabled = v, () -> config.tridentSeconds, v -> config.tridentSeconds = v);
 			addItemEntries(entries, items, "sword", () -> config.swordEnabled, v -> config.swordEnabled = v, () -> config.swordSeconds, v -> config.swordSeconds = v);
-			addItemEntries(entries, items, "mace", () -> config.maceEnabled, v -> config.maceEnabled = v, () -> config.maceSeconds, v -> config.maceSeconds = v);
 			addItemEntries(entries, items, "axe", () -> config.axeEnabled, v -> config.axeEnabled = v, () -> config.axeSeconds, v -> config.axeSeconds = v);
 
 			addKeyEntry(entries, binds, "modifier", config.cameraAdjustModifierKey, org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_ALT, v -> config.cameraAdjustModifierKey = v);
@@ -55,7 +54,7 @@ public class PWridePerspectiveModMenu implements ModMenuApi {
 	}
 
 	private static void addKeyEntry(ConfigEntryBuilder entries, ConfigCategory category, String key, int value, int defaultKey, java.util.function.IntConsumer saver) {
-		category.addEntry(entries.startKeyCodeField(Component.translatable(KEY + "binding." + key), keyFromCode(value))
+		category.addEntry(entries.startKeyCodeField(new TranslatableComponent(KEY + "binding." + key), keyFromCode(value))
 			.setDefaultValue(keyFromCode(defaultKey))
 			.setKeySaveConsumer(input -> saver.accept(input.getValue()))
 			.build());
@@ -72,11 +71,11 @@ public class PWridePerspectiveModMenu implements ModMenuApi {
 		java.util.function.Supplier<Boolean> enabledSupplier, java.util.function.Consumer<Boolean> enabledSaver,
 		java.util.function.Supplier<Double> secondsSupplier, java.util.function.Consumer<Double> secondsSaver) {
 		String itemLabelKey = KEY + "item." + itemKey;
-		category.addEntry(entries.startBooleanToggle(Component.translatable(itemLabelKey + ".combat"), enabledSupplier.get())
+		category.addEntry(entries.startBooleanToggle(new TranslatableComponent(itemLabelKey + ".combat"), enabledSupplier.get())
 			.setDefaultValue(true)
 			.setSaveConsumer(enabledSaver)
 			.build());
-		category.addEntry(entries.startDoubleField(Component.translatable(itemLabelKey + ".duration"), secondsSupplier.get())
+		category.addEntry(entries.startDoubleField(new TranslatableComponent(itemLabelKey + ".duration"), secondsSupplier.get())
 			.setDefaultValue(0.0D)
 			.setMin(0.0D)
 			.setMax(60.0D)
